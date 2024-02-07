@@ -19,7 +19,15 @@ namespace MTCG.Models
         {
             Username = username;
             Password = password;
-            //Coins = 0;
+            Coins = 20;
+            Stack = new List<Card>();
+        }
+
+        public User(string username, string password, int coins)
+        {
+            Username = username;
+            Password = password;
+            Coins = coins;
             Stack = new List<Card>();
         }
     }

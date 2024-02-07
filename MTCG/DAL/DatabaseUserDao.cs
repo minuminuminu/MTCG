@@ -11,17 +11,18 @@ namespace MTCG.DAL
 {
     internal class DatabaseUserDao : IUserDao
     {
-        private const string CreateUserTableCommand = @"CREATE TABLE IF NOT EXISTS users (username varchar PRIMARY KEY, password varchar);";
-        private const string SelectAllUsersCommand = @"SELECT username, password FROM users";
-        private const string SelectUserByCredentialsCommand = "SELECT username, password FROM users WHERE username=@username AND password=@password";
-        private const string InsertUserCommand = @"INSERT INTO users(username, password) VALUES (@username, @password)";
+        private const string CreateUserTableCommand = @"CREATE TABLE IF NOT EXISTS users (username varchar PRIMARY KEY, password varchar, coins integer, token varchar);";
+        private const string SelectAllUsersCommand = @"SELECT * FROM users";
+        private const string SelectUserByCredentialsCommand = "SELECT * FROM users WHERE username=@username AND password=@password";
+        private const string InsertUserCommand = @"INSERT INTO users(username, password, coins, token) VALUES (@username, @password, @coins, @token)";
+
 
         private readonly string _connectionString;
 
         public DatabaseUserDao(string connectionString)
         {
             _connectionString = connectionString;
-            //EnsureTables(); UNCOMMENT FOR DATABASE IMPLEMENTATION
+            EnsureTables();
         }
 
         public User? GetUserByAuthToken(string authToken)
@@ -60,6 +61,8 @@ namespace MTCG.DAL
             using var cmd = new NpgsqlCommand(InsertUserCommand, connection);
             cmd.Parameters.AddWithValue("username", user.Username);
             cmd.Parameters.AddWithValue("password", user.Password);
+            cmd.Parameters.AddWithValue("coins", user.Coins);
+            cmd.Parameters.AddWithValue("token", user.Token);
             var affectedRows = cmd.ExecuteNonQuery();
 
             return affectedRows > 0;
@@ -97,8 +100,9 @@ namespace MTCG.DAL
         {
             var username = Convert.ToString(record["username"])!;
             var password = Convert.ToString(record["password"])!;
+            var coins = Convert.ToInt16(record["coins"])!;
 
-            return new User(username, password);
+            return new User(username, password, coins);
         }
     }
 }

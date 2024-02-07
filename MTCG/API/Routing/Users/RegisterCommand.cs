@@ -28,14 +28,11 @@ namespace MTCG.API.Routing.Users
             try
             {
                 _userManager.RegisterUser(_credentials);
-                response = new HttpResponse(StatusCode.Created, "Hello there!");
-                Console.WriteLine("Testing Payload");
-                Console.WriteLine("Username: " + _credentials.Username);
-                Console.WriteLine("Password: " + _credentials.Password);
+                response = new HttpResponse(StatusCode.Created, "User successfully created");
             }
             catch (DuplicateUserException)
             {
-                response = new HttpResponse(StatusCode.Conflict);
+                response = new HttpResponse(StatusCode.Conflict, "User with same username already registered");
             }
 
             return response;

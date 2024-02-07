@@ -10,7 +10,7 @@ namespace MTCG
     {
         static void Main(string[] args)
         {
-            var connectionString = "Host=localhost;Username=postgres;Password=postgres;Database=swe1messagedb";
+            var connectionString = "Host=localhost;Username=mtcg_minu;Password=minuminuminu;Database=mydb";
 
             IUserDao userDao = new DatabaseUserDao(connectionString);
 
@@ -19,6 +19,7 @@ namespace MTCG
             var router = new Router(userManager);
             var server = new HttpServer.HttpServer(router, IPAddress.Any, 10001);
             server.Start();
+            Console.WriteLine("Server is running on port 10001.");
         }
     }
 }

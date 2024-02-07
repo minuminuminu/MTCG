@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MTCG.DAL;
 using MTCG.Models;
+using Npgsql;
 
 namespace MTCG.BLL
 {
@@ -27,15 +28,37 @@ namespace MTCG.BLL
             return _userDao.GetUserByCredentials(credentials.Username, credentials.Password) ?? throw new UserNotFoundException();
         }
 
+        //public void RegisterUser(UserCredentials credentials)
+        //{
+        //    var user = new User(credentials.Username, credentials.Password);
+        //    if (_userDao.InsertUser(user) == false)
+        //    {
+        //        throw new DuplicateUserException();
+        //    }
+
+        //    Console.WriteLine("Registered User successfully");
+        //}
+
         public void RegisterUser(UserCredentials credentials)
         {
-            //var user = new User(credentials.Username, credentials.Password);
-            //if (_userDao.InsertUser(user) == false)
-            //{
-            //    throw new DuplicateUserException();
-            //}
-
-            Console.WriteLine("Registered User successfully");
+            try
+            {
+                var user = new User(credentials.Username, credentials.Password);
+                _userDao.InsertUser(user);
+            }
+            catch (Npgsql.PostgresException ex)
+            {
+                if (ex.SqlState == "23505") // duplicate pkey violation code
+                {
+                    throw new DuplicateUserException();
+                }
+                else
+                {
+                    // other exceptions
+                    throw;
+                }
+            }
         }
+
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MTCG.API.Routing;
 using MTCG.API.Routing.Users;
+using MTCG.API.Routing.Packages;
 using MTCG.BLL;
 using MTCG.HttpServer.Request;
 using MTCG.Models;
@@ -32,6 +33,9 @@ namespace MTCG.HttpServer.Routing
                 return request switch
                 {
                     { Method: Request.HttpMethod.Post, ResourcePath: "/users" } => new RegisterCommand(_userManager, Deserialize<UserCredentials>(request.Payload)),
+                    { Method: Request.HttpMethod.Post, ResourcePath: "/sessions" } => new LoginCommand(_userManager, Deserialize<UserCredentials>(request.Payload)),
+                    { Method: Request.HttpMethod.Post, ResourcePath: "/packages" } => new CreatePackageCommand(Deserialize<Queue<Card>>(request.Payload), GetIdentity(request).Token),
+                    //{ Method: Request.HttpMethod.Post, ResourcePath: "/packages" } => new CreatePackageCommand(),
 
                     _ => null
                 };
