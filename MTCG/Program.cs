@@ -2,6 +2,7 @@
 using MTCG.DAL;
 using MTCG.HttpServer;
 using MTCG.HttpServer.Routing;
+using Npgsql;
 using System.Net;
 
 namespace MTCG
@@ -10,16 +11,19 @@ namespace MTCG
     {
         static void Main(string[] args)
         {
-            var connectionString = "Host=localhost;Username=mtcg_minu;Password=minuminuminu;Database=mydb";
+            var connectionString = "Host=localhost;Username=mtcg_minu;Password=minuminuminu;Database=mydb;Include Error Detail=true";
 
             IUserDao userDao = new DatabaseUserDao(connectionString);
+            ICardDao cardDao = new DatabaseCardDao(connectionString);
+            IPackageDao packageDao = new DatabasePackageDao(connectionString);
 
-            IUserManager userManager = new UserManager(userDao); 
+            IUserManager userManager = new UserManager(userDao);
+            IPackageManager packageManager = new PackageManager(packageDao, cardDao);
 
-            var router = new Router(userManager);
+            var router = new Router(userManager, packageManager);
             var server = new HttpServer.HttpServer(router, IPAddress.Any, 10001);
-            server.Start();
             Console.WriteLine("Server is running on port 10001.");
+            server.Start();
         }
     }
 }

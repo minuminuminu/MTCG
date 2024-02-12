@@ -9,6 +9,7 @@ namespace MTCG.BLL
 {
     internal interface IPackageManager
     {
-        public void CreatePackage(UserCredentials credentials);
+        void AddPackage(List<CardSchema> cards);
+        List<CardSchema> AcquirePackage(User user);
     }
 }

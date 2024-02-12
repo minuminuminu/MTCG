@@ -11,8 +11,8 @@ namespace MTCG.Models
         public string Username { get; set; }
         public string Password { get; set; }    
         public int Coins { get; set; }
-        public List<Card> Stack { get; set; }
-        public Card[] Deck = new Card[4];
+        public List<CardSchema> Stack { get; set; }
+        public CardSchema[] Deck = new CardSchema[4];
         public string Token => $"{Username}-mtcgToken";
 
         public User(string username, string password)
@@ -20,7 +20,7 @@ namespace MTCG.Models
             Username = username;
             Password = password;
             Coins = 20;
-            Stack = new List<Card>();
+            Stack = new List<CardSchema>();
         }
 
         public User(string username, string password, int coins)
@@ -28,7 +28,7 @@ namespace MTCG.Models
             Username = username;
             Password = password;
             Coins = coins;
-            Stack = new List<Card>();
+            Stack = new List<CardSchema>();
         }
     }
 }

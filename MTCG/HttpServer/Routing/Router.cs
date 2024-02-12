@@ -16,14 +16,16 @@ namespace MTCG.HttpServer.Routing
     internal class Router
     {
         private readonly IUserManager _userManager;
+        private readonly IPackageManager _packageManager;
         private readonly IdentityProvider _identityProvider;
         private readonly IdRouteParser _routeParser;
 
-        public Router(IUserManager userManager)
+        public Router(IUserManager userManager, IPackageManager packageManager)
         {
             _userManager = userManager;
             _identityProvider = new IdentityProvider(userManager);
             _routeParser = new IdRouteParser();
+            _packageManager = packageManager;
         }
 
         public IRouteCommand? Resolve(HttpRequest request)
@@ -34,11 +36,11 @@ namespace MTCG.HttpServer.Routing
                 {
                     { Method: Request.HttpMethod.Post, ResourcePath: "/users" } => new RegisterCommand(_userManager, Deserialize<UserCredentials>(request.Payload)),
                     { Method: Request.HttpMethod.Post, ResourcePath: "/sessions" } => new LoginCommand(_userManager, Deserialize<UserCredentials>(request.Payload)),
-                    { Method: Request.HttpMethod.Post, ResourcePath: "/packages" } => new CreatePackageCommand(Deserialize<Queue<Card>>(request.Payload), GetIdentity(request).Token),
-                    //{ Method: Request.HttpMethod.Post, ResourcePath: "/packages" } => new CreatePackageCommand(),
+                    { Method: Request.HttpMethod.Post, ResourcePath: "/packages" } => new CreatePackageCommand(_packageManager, Deserialize<List<CardSchema>>(request.Payload), GetIdentity(request).Token),
+                    { Method: Request.HttpMethod.Post, ResourcePath: "/transactions/packages" } => new AcquirePackageCommand(_packageManager, GetIdentity(request)),
 
                     _ => null
-                };
+                }; ;
             } catch(InvalidDataException)
             {
                 return null;

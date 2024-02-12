@@ -28,17 +28,6 @@ namespace MTCG.BLL
             return _userDao.GetUserByCredentials(credentials.Username, credentials.Password) ?? throw new UserNotFoundException();
         }
 
-        //public void RegisterUser(UserCredentials credentials)
-        //{
-        //    var user = new User(credentials.Username, credentials.Password);
-        //    if (_userDao.InsertUser(user) == false)
-        //    {
-        //        throw new DuplicateUserException();
-        //    }
-
-        //    Console.WriteLine("Registered User successfully");
-        //}
-
         public void RegisterUser(UserCredentials credentials)
         {
             try
