@@ -11,10 +11,11 @@ namespace MTCG.DAL
 {
     internal class DatabaseUserDao : IUserDao
     {
-        private const string CreateUserTableCommand = @"CREATE TABLE IF NOT EXISTS users (username varchar PRIMARY KEY, password varchar, coins integer, token varchar);";
+        private const string CreateUserTableCommand = @"CREATE TABLE IF NOT EXISTS users (username varchar PRIMARY KEY, password varchar, coins integer, token varchar UNIQUE);";
         private const string SelectAllUsersCommand = @"SELECT * FROM users";
         private const string SelectUserByCredentialsCommand = "SELECT * FROM users WHERE username=@username AND password=@password";
         private const string InsertUserCommand = @"INSERT INTO users(username, password, coins, token) VALUES (@username, @password, @coins, @token)";
+        private const string WithdrawCoinsCommand = "UPDATE users SET coins=coins-@amount WHERE username=@username";
 
 
         private readonly string _connectionString;
@@ -66,6 +67,17 @@ namespace MTCG.DAL
             var affectedRows = cmd.ExecuteNonQuery();
 
             return affectedRows > 0;
+        }
+
+        public void WithdrawCoins(int amount, string username)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var cmd = new NpgsqlCommand(WithdrawCoinsCommand, connection);
+            cmd.Parameters.AddWithValue("amount", amount);
+            cmd.Parameters.AddWithValue("username", username);
+            var affectedRows = cmd.ExecuteNonQuery();
         }
 
         private void EnsureTables()

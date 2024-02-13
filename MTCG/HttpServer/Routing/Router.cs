@@ -37,7 +37,8 @@ namespace MTCG.HttpServer.Routing
                     { Method: Request.HttpMethod.Post, ResourcePath: "/users" } => new RegisterCommand(_userManager, Deserialize<UserCredentials>(request.Payload)),
                     { Method: Request.HttpMethod.Post, ResourcePath: "/sessions" } => new LoginCommand(_userManager, Deserialize<UserCredentials>(request.Payload)),
                     { Method: Request.HttpMethod.Post, ResourcePath: "/packages" } => new CreatePackageCommand(_packageManager, Deserialize<List<CardSchema>>(request.Payload), GetIdentity(request).Token),
-                    { Method: Request.HttpMethod.Post, ResourcePath: "/transactions/packages" } => new AcquirePackageCommand(_packageManager, GetIdentity(request)),
+                    { Method: Request.HttpMethod.Post, ResourcePath: "/transactions/packages" } => new AcquirePackageCommand(_packageManager, _userManager, GetIdentity(request).Token),
+                    { Method: Request.HttpMethod.Get, ResourcePath: "/cards" } => new ShowAllUserCardsCommand(_packageManager, GetIdentity(request).Token),
 
                     _ => null
                 }; ;

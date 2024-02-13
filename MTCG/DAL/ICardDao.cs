@@ -10,5 +10,7 @@ namespace MTCG.DAL
     internal interface ICardDao
     {
         bool InsertCard(CardSchema card);
+        void ReassignCardOwnership(int packageId, string authToken);
+        List<CardSchema> GetCardsByAuthToken(string authToken);
     }
 }

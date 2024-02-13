@@ -67,7 +67,7 @@ namespace MTCG.HttpServer
                 }
                 catch (RouteNotAuthenticatedException)
                 {
-                    response = new HttpResponse(StatusCode.Unauthorized, "Access token is missing or invalid");
+                    response = new HttpResponse(StatusCode.Unauthorized);
                 }
             }
 

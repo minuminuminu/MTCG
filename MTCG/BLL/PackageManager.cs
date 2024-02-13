@@ -48,9 +48,36 @@ namespace MTCG.BLL
             _packageDao.InsertPackage(cardIds);
         }
 
-        public List<CardSchema> AcquirePackage(User user)
+        public bool IsPackageAvailable()
         {
+            return _packageDao.IsPackageAvailable();
+        }
 
+        public List<CardSchema> GetAllCardsByAuthToken(string authToken)
+        {
+            List<CardSchema> cards = _cardDao.GetCardsByAuthToken(authToken);
+
+            if(cards.Count == 0)
+            {
+                throw new NoCardsException();
+            }
+
+            return cards;
+        }
+
+        public void AcquirePackage(string authToken)
+        {
+            try
+            {
+                int packageId = _packageDao.GetOldestPackageId();
+
+                _cardDao.ReassignCardOwnership(packageId, authToken);
+                _packageDao.DeletePackage(packageId);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

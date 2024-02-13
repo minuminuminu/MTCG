@@ -29,7 +29,6 @@ namespace MTCG.API.Routing
                 {
                     try
                     {
-                        Console.WriteLine(authToken.Substring(prefix.Length));
                         currentUser = _userManager.GetUserByAuthToken(authToken.Substring(prefix.Length));
                     }
                     catch { }

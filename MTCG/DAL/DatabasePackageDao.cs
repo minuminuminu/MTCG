@@ -23,6 +23,7 @@ namespace MTCG.DAL
         private const string SelectAllPackagesCommand = "SELECT * FROM packages";
         private const string DeletePackageCommand = "DELETE FROM packages WHERE package_id=@package_id";
         private const string DeletePackageCardsRelationCommand = "DELETE FROM package_cards WHERE package_id=@package_id";
+        private const string GetOldestPackageIdCommand = "SELECT package_id FROM packages ORDER BY package_id ASC LIMIT 1";
 
         private readonly string _connectionString;
 
@@ -60,10 +61,39 @@ namespace MTCG.DAL
             return true;
         }
 
-        private void DeletePackage(int packageId)
+        public int GetOldestPackageId()
         {
-            // delete card - package relationship
-            // delete package entry
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var cmd = new NpgsqlCommand(GetOldestPackageIdCommand, connection);
+            return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        public void DeletePackage(int packageId)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var cmdDeletePackageCards = new NpgsqlCommand(DeletePackageCardsRelationCommand, connection);
+            cmdDeletePackageCards.Parameters.AddWithValue("package_id", packageId);
+            cmdDeletePackageCards.ExecuteNonQuery();
+
+            using var cmdDeletePackageEntry = new NpgsqlCommand(DeletePackageCommand, connection);
+            cmdDeletePackageEntry.Parameters.AddWithValue("package_id", packageId);
+            cmdDeletePackageEntry.ExecuteNonQuery();
+        }
+
+        public bool IsPackageAvailable()
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var cmd = new NpgsqlCommand(SelectAllPackagesCommand, connection);
+            using (var reader = cmd.ExecuteReader())
+            {
+                return reader.HasRows;
+            }
         }
 
         private void EnsureTables()

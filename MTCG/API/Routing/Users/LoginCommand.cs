@@ -37,7 +37,7 @@ namespace MTCG.API.Routing.Users
             HttpResponse response;
             if(user == null)
             {
-                response = new HttpResponse(StatusCode.Unauthorized, "Invalid username/password provided");
+                response = new HttpResponse(StatusCode.Unauthorized);
             }
             else
             {

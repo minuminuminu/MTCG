@@ -12,5 +12,6 @@ namespace MTCG.DAL
         User? GetUserByAuthToken(string authToken);
         User? GetUserByCredentials(string username, string password);
         bool InsertUser(User user);
+        void WithdrawCoins(int amount, string username);
     }
 }

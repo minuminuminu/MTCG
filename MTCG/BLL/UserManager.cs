@@ -49,5 +49,16 @@ namespace MTCG.BLL
             }
         }
 
+        public void WithdrawCoinsForPackage(string authToken)
+        {
+            User? user = GetUserByAuthToken(authToken);
+
+            if(user.Coins < 5)
+            {
+                throw new NotEnoughCoinsException();
+            }
+
+            _userDao.WithdrawCoins(5, user.Username);
+        }
     }
 }

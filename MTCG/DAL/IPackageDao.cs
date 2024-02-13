@@ -10,6 +10,8 @@ namespace MTCG.DAL
     internal interface IPackageDao
     {
         bool InsertPackage(List<string> cardIds);
-        
+        bool IsPackageAvailable();
+        void DeletePackage(int packageId);
+        int GetOldestPackageId();
     }
 }

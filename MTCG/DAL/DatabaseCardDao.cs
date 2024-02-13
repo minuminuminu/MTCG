@@ -10,9 +10,10 @@ namespace MTCG.DAL
 {
     internal class DatabaseCardDao : ICardDao
     {
-        private const string CreateCardTableCommand = @"CREATE TABLE IF NOT EXISTS cards (card_id VARCHAR PRIMARY KEY, card_name VARCHAR(255) NOT NULL, damage FLOAT NOT NULL, card_owner VARCHAR(255) DEFAULT NULL, FOREIGN KEY (card_owner) REFERENCES users(username) ON DELETE SET NULL);";
+        private const string CreateCardTableCommand = @"CREATE TABLE IF NOT EXISTS cards (card_id VARCHAR PRIMARY KEY, card_name VARCHAR(255) NOT NULL, damage FLOAT NOT NULL, card_owner VARCHAR(255) DEFAULT NULL, FOREIGN KEY (card_owner) REFERENCES users(token) ON DELETE SET NULL);";
         private const string InsertCardCommand = "INSERT INTO cards(card_id, card_name, damage) VALUES (@card_id, @card_name, @damage)";
-        private const string AssignOwnerCommand = "UPDATE cards SET card_owner = @username WHERE card_id = @card_id";
+        private const string ReassignCardOwnerCommand = "UPDATE cards SET card_owner = @authToken WHERE card_id IN (SELECT card_id FROM package_cards WHERE package_id = @packageId)";
+        private const string GetCardsByAuthTokenCommand = "SELECT * FROM cards WHERE card_owner = @authToken";
 
         private readonly string _connectionString;
 
@@ -36,6 +37,36 @@ namespace MTCG.DAL
             var affectedRows = cmd.ExecuteNonQuery();
 
             return affectedRows > 0;
+        }
+
+        public List<CardSchema> GetCardsByAuthToken(string authToken)
+        {
+            List<CardSchema> cards = new List<CardSchema>();
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var cmd = new NpgsqlCommand(GetCardsByAuthTokenCommand, connection);
+            cmd.Parameters.AddWithValue("authToken", authToken);
+            using var reader = cmd.ExecuteReader();
+
+            while(reader.Read())
+            {
+                cards.Add(new CardSchema(reader.GetString(reader.GetOrdinal("card_id")), reader.GetString(reader.GetOrdinal("card_name")), reader.GetFloat(reader.GetOrdinal("damage"))));
+            }
+
+            return cards;
+        }
+
+        public void ReassignCardOwnership(int packageId, string authToken)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var cmd = new NpgsqlCommand(ReassignCardOwnerCommand, connection);
+            cmd.Parameters.AddWithValue("authToken", authToken);
+            cmd.Parameters.AddWithValue("packageId", packageId);
+            cmd.ExecuteNonQuery();
         }
 
         private void EnsureTables()

@@ -10,6 +10,8 @@ namespace MTCG.BLL
     internal interface IPackageManager
     {
         void AddPackage(List<CardSchema> cards);
-        List<CardSchema> AcquirePackage(User user);
+        void AcquirePackage(string authToken);
+        bool IsPackageAvailable();
+        List<CardSchema> GetAllCardsByAuthToken(string authToken);
     }
 }

@@ -12,5 +12,6 @@ namespace MTCG.BLL
         User LoginUser(UserCredentials credentials);
         void RegisterUser(UserCredentials credentials);
         User GetUserByAuthToken(string authToken);
+        void WithdrawCoinsForPackage(string authToken);
     }
 }
