@@ -10,6 +10,8 @@ namespace MTCG.DAL
     internal interface IUserDao
     {
         User? GetUserByAuthToken(string authToken);
+        User? GetUserByUsername(string username);
+        bool UpdateUserData(string username, UserData userData);
         User? GetUserByCredentials(string username, string password);
         bool InsertUser(User user);
         void WithdrawCoins(int amount, string username);

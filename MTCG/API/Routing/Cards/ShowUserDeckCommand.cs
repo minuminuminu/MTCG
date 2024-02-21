@@ -1,25 +1,25 @@
 ﻿using MTCG.BLL;
-using MTCG.HttpServer.Response;
-using MTCG.HttpServer.Routing;
 using MTCG.Models;
-using Newtonsoft.Json;
+using MTCG.HttpServer.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MTCG.HttpServer.Response;
+using Newtonsoft.Json;
 
-namespace MTCG.API.Routing.Users
+namespace MTCG.API.Routing.Cards
 {
-    internal class ShowAllUserCardsCommand : IRouteCommand
+    internal class ShowUserDeckCommand : IRouteCommand
     {
-        IPackageManager _packageManager;
-        string _authToken;
+        private readonly IDeckManager _deckManager;
+        private readonly string _username;
 
-        public ShowAllUserCardsCommand(IPackageManager packageManager, string authToken)
+        public ShowUserDeckCommand(IDeckManager deckManager, string username)
         {
-            _packageManager = packageManager;
-            _authToken = authToken;
+            _deckManager = deckManager;
+            _username = username;
         }
 
         public HttpResponse Execute()
@@ -28,9 +28,8 @@ namespace MTCG.API.Routing.Users
 
             try
             {
-                List<CardSchema> cards = _packageManager.GetAllCardsByAuthToken(_authToken);
+                List<CardSchema> cards = _deckManager.GetCardsInDeck(_username);
                 var jsonPayload = JsonConvert.SerializeObject(cards);
-
                 response = new HttpResponse(StatusCode.Ok, jsonPayload);
             }
             catch (NoCardsException)

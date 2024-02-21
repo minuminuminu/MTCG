@@ -23,6 +23,19 @@ namespace MTCG.BLL
             return _userDao.GetUserByAuthToken(authToken) ?? throw new UserNotFoundException();
         }
 
+        public User GetUserByUsername(string username)
+        {
+            return _userDao.GetUserByUsername(username) ?? throw new UserNotFoundException();
+        }
+
+        public void UpdateUserData(string username, UserData userData)
+        {
+            if(!_userDao.UpdateUserData(username, userData))
+            {
+                throw new UserNotFoundException();
+            }
+        }
+
         public User LoginUser(UserCredentials credentials)
         {
             return _userDao.GetUserByCredentials(credentials.Username, credentials.Password) ?? throw new UserNotFoundException();

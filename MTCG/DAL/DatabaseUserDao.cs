@@ -11,11 +11,12 @@ namespace MTCG.DAL
 {
     internal class DatabaseUserDao : IUserDao
     {
-        private const string CreateUserTableCommand = @"CREATE TABLE IF NOT EXISTS users (username varchar PRIMARY KEY, password varchar, coins integer, token varchar UNIQUE);";
+        private const string CreateUserTableCommand = @"CREATE TABLE IF NOT EXISTS users (username varchar PRIMARY KEY, password varchar, coins integer, token varchar UNIQUE, name varchar DEFAULT NULL, bio varchar DEFAULT NULL, image varchar DEFAULT NULL);";
         private const string SelectAllUsersCommand = @"SELECT * FROM users";
         private const string SelectUserByCredentialsCommand = "SELECT * FROM users WHERE username=@username AND password=@password";
         private const string InsertUserCommand = @"INSERT INTO users(username, password, coins, token) VALUES (@username, @password, @coins, @token)";
         private const string WithdrawCoinsCommand = "UPDATE users SET coins=coins-@amount WHERE username=@username";
+        private const string UpdateUserDataCommand = @"UPDATE users SET name=@name, bio=@bio, image=@image WHERE username=@username;";
 
 
         private readonly string _connectionString;
@@ -29,6 +30,25 @@ namespace MTCG.DAL
         public User? GetUserByAuthToken(string authToken)
         {
             return GetAllUsers().SingleOrDefault(u => u.Token == authToken);
+        }
+        public User? GetUserByUsername(string username)
+        {
+            return GetAllUsers().SingleOrDefault(u => u.Username == username);
+        }
+
+        public bool UpdateUserData(string username, UserData userData)
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+
+            using var cmd = new NpgsqlCommand(UpdateUserDataCommand, connection);
+            cmd.Parameters.AddWithValue("username", username);
+            cmd.Parameters.AddWithValue("name", userData.Name);
+            cmd.Parameters.AddWithValue("bio", userData.Bio);
+            cmd.Parameters.AddWithValue("image", userData.Image);
+
+            var affectedRows = cmd.ExecuteNonQuery();
+            return affectedRows > 0;
         }
 
         public User? GetUserByCredentials(string username, string password)
@@ -113,8 +133,11 @@ namespace MTCG.DAL
             var username = Convert.ToString(record["username"])!;
             var password = Convert.ToString(record["password"])!;
             var coins = Convert.ToInt16(record["coins"])!;
+            var name = Convert.ToString(record["name"])!;
+            var bio = Convert.ToString(record["bio"])!;
+            var image = Convert.ToString(record["image"])!;
 
-            return new User(username, password, coins);
+            return new User(username, password, coins, name, bio, image);
         }
     }
 }

@@ -12,5 +12,6 @@ namespace MTCG.DAL
         bool InsertCard(CardSchema card);
         void ReassignCardOwnership(int packageId, string authToken);
         List<CardSchema> GetCardsByAuthToken(string authToken);
+        bool AreCardsOwnedByUser(List<string> cardIds, string authToken);
     }
 }

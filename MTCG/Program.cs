@@ -16,11 +16,13 @@ namespace MTCG
             IUserDao userDao = new DatabaseUserDao(connectionString);
             ICardDao cardDao = new DatabaseCardDao(connectionString);
             IPackageDao packageDao = new DatabasePackageDao(connectionString);
+            IDeckDao deckDao = new DatabaseDeckDao(connectionString);
 
+            IDeckManager deckManager = new DeckManager(deckDao);
             IUserManager userManager = new UserManager(userDao);
             IPackageManager packageManager = new PackageManager(packageDao, cardDao);
 
-            var router = new Router(userManager, packageManager);
+            var router = new Router(userManager, deckManager, packageManager);
             var server = new HttpServer.HttpServer(router, IPAddress.Any, 10001);
             Console.WriteLine("Server is running on port 10001.");
             server.Start();

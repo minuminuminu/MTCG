@@ -48,6 +48,11 @@ namespace MTCG.BLL
             _packageDao.InsertPackage(cardIds);
         }
 
+        public bool AreCardsOwnedByUser(List<string> cardIds, string authToken)
+        {
+            return _cardDao.AreCardsOwnedByUser(cardIds, authToken);
+        }
+
         public bool IsPackageAvailable()
         {
             return _packageDao.IsPackageAvailable();

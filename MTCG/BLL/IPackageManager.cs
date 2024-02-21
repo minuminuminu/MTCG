@@ -13,5 +13,6 @@ namespace MTCG.BLL
         void AcquirePackage(string authToken);
         bool IsPackageAvailable();
         List<CardSchema> GetAllCardsByAuthToken(string authToken);
+        bool AreCardsOwnedByUser(List<string> cardIds, string authToken);
     }
 }

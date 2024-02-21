@@ -14,6 +14,7 @@ namespace MTCG.DAL
         private const string InsertCardCommand = "INSERT INTO cards(card_id, card_name, damage) VALUES (@card_id, @card_name, @damage)";
         private const string ReassignCardOwnerCommand = "UPDATE cards SET card_owner = @authToken WHERE card_id IN (SELECT card_id FROM package_cards WHERE package_id = @packageId)";
         private const string GetCardsByAuthTokenCommand = "SELECT * FROM cards WHERE card_owner = @authToken";
+        private const string CheckCardExistsAndBelongsToUserCommand = "SELECT card_id FROM cards WHERE card_id = @cardId AND card_owner = @authToken;";
 
         private readonly string _connectionString;
 
@@ -21,6 +22,34 @@ namespace MTCG.DAL
         {
             _connectionString = connectionString;
             EnsureTables();
+        }
+
+        public bool AreCardsOwnedByUser(List<string> cardIds, string authToken)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                foreach (string id in cardIds)
+                {
+                    using (var cmd = new NpgsqlCommand(CheckCardExistsAndBelongsToUserCommand, connection))
+                    {
+                        cmd.Parameters.AddWithValue("cardId", id);
+                        cmd.Parameters.AddWithValue("authToken", authToken);
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            // If a row is not returned, the card does not exist or does not belong to the user
+                            if (!reader.Read())
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         public bool InsertCard(CardSchema card)

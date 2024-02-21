@@ -11,24 +11,32 @@ namespace MTCG.Models
         public string Username { get; set; }
         public string Password { get; set; }    
         public int Coins { get; set; }
-        public List<CardSchema> Stack { get; set; }
-        public CardSchema[] Deck = new CardSchema[4];
+        //public List<CardSchema> Stack { get; set; }
         public string Token => $"{Username}-mtcgToken";
+        public string Name { get; set; }
+        public string Bio { get; set; }
+        public string Image { get; set; }
 
         public User(string username, string password)
         {
             Username = username;
             Password = password;
             Coins = 20;
-            Stack = new List<CardSchema>();
+            //Stack = new List<CardSchema>();
+            Name = string.Empty;
+            Bio = string.Empty;
+            Image = string.Empty;
         }
 
-        public User(string username, string password, int coins)
+        public User(string username, string password, int coins, string name, string bio, string image)
         {
             Username = username;
             Password = password;
             Coins = coins;
-            Stack = new List<CardSchema>();
+            //Stack = new List<CardSchema>();
+            Name = name;
+            Bio = bio;
+            Image = image;
         }
     }
 }
