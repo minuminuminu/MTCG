@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MTCG.API.Routing;
 using MTCG.API.Routing.Users;
-using MTCG.API.Routing.Packages;
+using MTCG.API.Routing.CardPackages;
 using MTCG.API.Routing.Cards;
 using MTCG.BLL;
 using MTCG.HttpServer.Request;
