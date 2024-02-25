@@ -12,5 +12,6 @@ namespace MTCG.DAL
         void CreateUserDeckEntry(string username);
         List<CardSchema> GetDeckCardByUsername(string username);
         void ConfigureDeck(List<string> cardIds, string username);
+        bool IsCardInDeck(string cardId);
     }
 }

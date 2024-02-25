@@ -24,6 +24,25 @@ namespace MTCG.DAL
             EnsureTables();
         }
 
+        public bool IsCardOwnedByUser(string cardId, string authToken)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new NpgsqlCommand(CheckCardExistsAndBelongsToUserCommand, connection))
+                {
+                    cmd.Parameters.AddWithValue("cardId", cardId);
+                    cmd.Parameters.AddWithValue("authToken", authToken);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        return reader.Read();
+                    }
+                }
+            }
+        }
+
         public bool AreCardsOwnedByUser(List<string> cardIds, string authToken)
         {
             using (var connection = new NpgsqlConnection(_connectionString))

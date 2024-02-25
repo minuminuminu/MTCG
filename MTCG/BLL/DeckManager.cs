@@ -39,6 +39,11 @@ namespace MTCG.BLL
             _deckDao.ConfigureDeck(cards, username);
         }
 
+        public void IsCardInDeck(string cardId)
+        {
+            if (_deckDao.IsCardInDeck(cardId)) throw new CardNotAvailableException();
+        }
+
         public void CreateUserDeck(string username)
         {
             _deckDao.CreateUserDeckEntry(username);

@@ -18,8 +18,7 @@ namespace MTCG.DAL
             card3_id VARCHAR DEFAULT NULL,
             card4_id VARCHAR DEFAULT NULL,
             CONSTRAINT unique_card_per_deck UNIQUE (deck_id, card1_id, card2_id, card3_id, card4_id)
-        );
-        ";
+        );";
         private const string InsertDefaultUserDeckCommand = "INSERT INTO decks(user_id) VALUES (@username)";
         private const string GetUserDeckByUsernameCommand = "SELECT * FROM decks WHERE user_id=@username";
         private const string GetDeckCardsByUsernameCommand = @"SELECT c.card_id, c.card_name, c.damage
@@ -28,6 +27,7 @@ namespace MTCG.DAL
             WHERE d.user_id = @username;
         ";
         private const string ConfigureDeckWithCardIdsCommand = @"UPDATE decks SET card1_id=@card1_id, card2_id=@card2_id, card3_id=@card3_id, card4_id=@card4_id WHERE user_id=@username;";
+        private const string CheckIfCardIsInDeckCommand = "SELECT * FROM decks WHERE card1_id = @cardId OR card2_id = @cardId OR card3_id = @cardId OR card4_id = @cardId;";
 
         private readonly string _connectionString;
 
@@ -35,6 +35,24 @@ namespace MTCG.DAL
         {
             _connectionString = connectionString;
             EnsureTables();
+        }
+
+        public bool IsCardInDeck(string cardId)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new NpgsqlCommand(CheckIfCardIsInDeckCommand, connection))
+                {
+                    cmd.Parameters.AddWithValue("cardId", cardId);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        return reader.Read();
+                    }
+                }
+            }
         }
 
         public void CreateUserDeckEntry(string username)

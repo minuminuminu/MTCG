@@ -12,5 +12,6 @@ namespace MTCG.BLL
         void CreateUserDeck(string username);
         List<CardSchema> GetCardsInDeck(string username);
         void ConfigureDeck(string username, List<string> cards);
+        void IsCardInDeck(string cardId);
     }
 }

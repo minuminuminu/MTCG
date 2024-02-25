@@ -14,12 +14,14 @@ namespace MTCG.API.Routing.Users
     {
         private readonly IUserManager _userManager;
         private readonly IDeckManager _deckManager;
+        private readonly IScoreManager _scoreManager;
         private readonly UserCredentials _credentials;
 
-        public RegisterCommand(IUserManager userManager, IDeckManager deckManager, UserCredentials credentials)
+        public RegisterCommand(IUserManager userManager, IDeckManager deckManager, IScoreManager scoreManager, UserCredentials credentials)
         {
             _userManager = userManager;
             _deckManager = deckManager;
+            _scoreManager = scoreManager;
             _credentials = credentials;
         }
 
@@ -31,6 +33,7 @@ namespace MTCG.API.Routing.Users
             {
                 _userManager.RegisterUser(_credentials);
                 _deckManager.CreateUserDeck(_credentials.Username);
+                _scoreManager.CreateStatsEntryForNewUser(_credentials.Username);
                 response = new HttpResponse(StatusCode.Created);
             }
             catch (DuplicateUserException)
